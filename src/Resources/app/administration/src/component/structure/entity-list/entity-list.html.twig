@@ -1,0 +1,264 @@
+{% block aggro_entity_list %}
+<sw-page class="aggro-entity-list">
+
+    {% block aggro_entity_list_search_bar %}
+        <template #search-bar>
+            <sw-search-bar
+                    :initial-search-type="entity"
+                    :initial-search="term"
+                    @search="onSearch"
+            />
+        </template>
+    {% endblock %}
+
+    {% block aggro_entity_list_smart_bar_header %}
+        <template #smart-bar-header>
+            {% block aggro_entity_list_smart_bar_header_title %}
+                <h2>
+                    {% block aggro_entity_list_smart_bar_header_title_text %}
+                        {{ listHeader }}
+                    {% endblock %}
+
+                    {% block aggro_entity_list_smart_bar_header_amount %}
+                        <span
+                                v-if="!isLoading"
+                                class="sw-page__smart-bar-amount"
+                        >
+                ({{ total }})
+            </span>
+                    {% endblock %}
+                </h2>
+            {% endblock %}
+        </template>
+    {% endblock %}
+
+    {% block aggro_entity_list_smart_bar_actions %}
+        <template #smart-bar-actions>
+            {% block aggro_entity_list_smart_bar_actions_add %}
+                <sw-button
+                        v-tooltip="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can(entity+'.creator'),
+                showOnDisabledElements: true
+            }"
+                        class="aggro-entity-list__button-create"
+                        variant="primary"
+                        :disabled="!acl.can('customer.creator') || undefined"
+                        :router-link="{ name: 'sw.customer.create' }"
+                >
+                    {{ $tc('sw-customer.list.buttonAddCustomer') }}
+                </sw-button>
+            {% endblock %}
+        </template>
+    {% endblock %}
+
+    <template #language-switch>
+        <sw-language-switch @on-change="onChangeLanguage" />
+    </template>
+
+    <template #content>
+        {% block aggro_entity_list_content %}
+        <div class="aggro-entity-list__content">
+            {% block aggro_entity_list_grid %}
+            <sw-entity-listing
+                    v-if="isLoading || (entities && entitySearchable)"
+                    ref="aggroEntityGrid"
+                    class="aggro-entity-list-grid"
+                    identifier="aggro-entity-list"
+                    :items="entities"
+                    :columns="entityColumns"
+                    :repository="entityRepository"
+                    :sort-by="currentSortBy"
+                    :sort-direction="sortDirection"
+                    detail-route="sw.customer.detail"
+                    :show-selection="acl.can(entity+'.deleter')"
+                    :allow-inline-edit="acl.can(entity+'.editor') || undefined"
+                    :allow-bulk-edit="acl.can(entity+'.editor')"
+                    :is-loading="isLoading"
+                    :disable-data-fetching="true"
+                    @selection-change="updateSelection"
+                    @inline-edit-save="onInlineEditSave"
+                    @page-change="onPageChange"
+                    @column-sort="onSortColumn"
+                    @bulk-edit-modal-open="onBulkEditModalOpen"
+            >
+
+
+                {% block aggro_entity_list_grid_columns_actions %}
+                    <template #actions="{ item }">
+                        {% block aggro_entity_list_grid_columns_actions_view %}
+                            <sw-context-menu-item
+                                    class="aggro-entity-list__view-action"
+                                    :router-link="{ name: 'sw.customer.detail', params: { id: item.id }, query: { edit: false } }"
+                            >
+                                {{ $tc('sw-customer.list.contextMenuView') }}
+                            </sw-context-menu-item>
+                        {% endblock %}
+
+                        {% block aggro_entity_list_grid_columns_actions_edit %}
+                            <sw-context-menu-item
+                                    class="aggro-entity-list__edit-action"
+                                    :disabled="!acl.can('customer.editor') || undefined"
+                                    :router-link="{ name: 'sw.customer.detail.base', params: { id: item.id }, query: { edit: true } }"
+                            >
+                                {{ $tc('sw-customer.list.contextMenuEdit') }}
+                            </sw-context-menu-item>
+                        {% endblock %}
+
+                        {% block aggro_entity_list_grid_columns_actions_delete %}
+                            <sw-context-menu-item
+                                    class="aggro-entity-list__delete-action"
+                                    variant="danger"
+                                    :disabled="!acl.can('customer.deleter') || undefined"
+                                    @click="onDelete(item.id)"
+                            >
+                                {{ $tc('sw-customer.list.contextMenuDelete') }}
+                            </sw-context-menu-item>
+                        {% endblock %}
+                    </template>
+                {% endblock %}
+
+                {% block aggro_entity_list_grid_action_modals %}
+                <template #action-modals="{ item }">
+
+                    {% block aggro_entity_list_delete_modal %}
+                    <sw-modal
+                            v-if="showDeleteModal === item.id"
+                            :title="$tc('global.default.warning')"
+                            variant="small"
+                            @modal-close="onCloseDeleteModal"
+                    >
+
+                        {% block aggro_entity_list_delete_modal_confirm_delete_text %}
+                        <p class="aggro-entity-list__confirm-delete-text">
+                        {{ $tc('sw-customer.list.textDeleteConfirm', 0, { name: `${item.firstName} ${item.lastName}` }) }}
+                    </p>
+                    {% endblock %}
+
+                    {% block aggro_entity_list_delete_modal_footer %}
+                        <template #modal-footer>
+
+                            {% block aggro_entity_list_delete_modal_cancel %}
+                            <sw-button
+                                    size="small"
+                                    @click="onCloseDeleteModal"
+                            >
+                                {{ $tc('global.default.cancel') }}
+                                </sw-button>
+                                {% endblock %}
+
+                                {% block aggro_entity_list_delete_modal_confirm %}
+                                <sw-button
+                                variant="danger"
+                                size="small"
+                                @click="onConfirmDelete(item.id)"
+                                >
+                                {{ $tc('sw-customer.list.buttonDelete') }}
+                            </sw-button>
+                            {% endblock %}
+                        </template>
+                        {% endblock %}
+                    </sw-modal>
+                    {% endblock %}
+                </template>
+                {% endblock %}
+
+                <template #pagination>
+                    {% block sw_order_list_grid_pagination %}
+                        <sw-pagination
+                                :page="page"
+                                :limit="limit"
+                                :total="total"
+                                :total-visible="7"
+                                @page-change="onPageChange"
+                        />
+                    {% endblock %}
+                </template>
+
+                {% block aggro_entity_list_bulk_edit_modal %}
+                    <template
+                            #bulk-edit-modal="{ selection }"
+                    >
+                        <sw-bulk-edit-modal
+                                v-if="showBulkEditModal"
+                                ref="bulkEditModal"
+                                class="aggro-entity-list-bulk-edit-modal"
+                                :selection="selection"
+                                :bulk-grid-edit-columns="entityColumns"
+                                @edit-items="onBulkEditItems"
+                                @modal-close="onBulkEditModalClose"
+                        >
+
+                        </sw-bulk-edit-modal>
+                    </template>
+                {% endblock %}
+            </sw-entity-listing>
+            {% endblock %}
+
+            {% block aggro_entity_list_empty_state %}
+                <template v-if="!isLoading && !total">
+                    <sw-empty-state
+                            v-if="filterCriteria.length || isValidTerm(term)"
+                            :title="$tc('sw-empty-state.messageNoResultTitle')"
+                    >
+                        <template #icon>
+                            <img
+                                    :src="assetFilter('/administration/static/img/empty-states/customer-empty-state.svg')"
+                                    :alt="$tc('sw-empty-state.messageNoResultTitle')"
+                            >
+                        </template>
+
+                        <template #default>
+                            {{ $tc('sw-empty-state.messageNoResultSublineBefore') }}
+                            <router-link
+                                    class="sw-empty-state__description-link"
+                                    :to="{ name: 'sw.profile.index.searchPreferences' }"
+                            >
+                                {{ $tc('sw-empty-state.messageNoResultSublineLink') }}
+                            </router-link>
+                            {{ $tc('sw-empty-state.messageNoResultSublineAfter') }}
+                        </template>
+                    </sw-empty-state>
+                    <sw-empty-state
+                            v-else
+                            :title="$tc('sw-customer.list.messageEmpty')"
+                    >
+                        <template #icon>
+                            <img
+                                    :src="assetFilter('/administration/static/img/empty-states/customer-empty-state.svg')"
+                                    :alt="$tc('sw-customer.list.messageEmpty')"
+                            >
+                        </template>
+                    </sw-empty-state>
+                </template>
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </template>
+
+    {% block aggro_entity_list_sidebar %}
+        <template #sidebar>
+            <sw-sidebar class="aggro-entity-list__sidebar">
+                {% block aggro_entity_list_sidebar_refresh %}
+                    <sw-sidebar-item
+                            icon="regular-undo"
+                            :title="$tc('sw-customer.list.titleSidebarItemRefresh')"
+                            @click="onRefresh"
+                    />
+                {% endblock %}
+
+                {% block aggro_entity_list_sidebar_filter %}
+                    <sw-sidebar-filter-panel
+                            :entity="entity"
+                            :store-key="storeKey"
+                            :filters="listFilters"
+                            :defaults="defaultFilters"
+                            :active-filter-number="activeFilterNumber"
+                            @criteria-changed="updateCriteria"
+                    />
+                {% endblock %}
+            </sw-sidebar>
+        </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}

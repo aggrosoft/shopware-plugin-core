@@ -1,0 +1,15 @@
+name: BuildPlugin
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build:
+    uses: FriendsOfShopware/actions/.github/workflows/github.yml@main
+    with:
+      extensionName: 'AggroPluginCorePlugin'
+      shopwareVersion: '6.6.0'
+      cliVersion: '0.4.29'
+    secrets:
+      ghToken: ${{ secrets.GH_TOKEN }}
