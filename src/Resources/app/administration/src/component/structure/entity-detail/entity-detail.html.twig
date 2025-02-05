@@ -103,15 +103,16 @@
                                             >
                                                 <template v-if="!isLoading">
                                                     <sw-container :columns="card.columns || '1fr'" gap="0px 30px">
-                                                        <sw-form-field-renderer
-                                                                v-for="field in card.fields"
-                                                                :key="field.ref"
+                                                        <template v-for="field in card.fields" :key="field.ref">
+                                                            <sw-form-field-renderer
                                                                 :type="field.type"
                                                                 :config="field.config"
+                                                                v-if="field.condition ? field.condition(editEntity) : true"
                                                                 v-model:value="editEntity[field.ref]"
                                                                 v-model:entity-collection="editEntity[field.ref]"
                                                                 class="aggro-entity-detail__field"
-                                                        />
+                                                            />
+                                                        </template>
                                                     </sw-container>
                                                 </template>
                                             </sw-card>
