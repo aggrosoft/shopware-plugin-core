@@ -1,0 +1,164 @@
+{% block aggro_entity_detail %}
+    <sw-page class="aggro-entity-detail">
+
+        {% block aggro_entity_detail_header %}
+            <template #smart-bar-header>
+                <h2>{{ placeholder(entity, 'name', $tc('aggro.entity-detail.textHeadline')) }}</h2>
+            </template>
+
+        {% endblock %}
+
+        {% block aggro_entity_detail_actions %}
+            <template #smart-bar-actions>
+
+                {% block aggro_entity_detail_actions_abort %}
+                    <sw-button
+                            v-tooltip.bottom="tooltipCancel"
+                            :disabled="entityIsLoading || undefined"
+                            @click="onCancel"
+                    >
+                        {{ $tc('global.default.cancel') }}
+                    </sw-button>
+                {% endblock %}
+
+                {% block aggro_entity_detail_actions_save %}
+                    <sw-button-process
+                            v-model:process-success="isSaveSuccessful"
+                            v-tooltip.bottom="tooltipSave"
+                            class="aggro-entity-detail__save-action"
+                            :is-loading="isLoading"
+                            :disabled="isLoading || !acl.can(entity+'.editor') || undefined"
+                            variant="primary"
+                            @click.prevent="onSave"
+                    >
+                        {{ $tc('aggro.entity-detail.buttonSave') }}
+                    </sw-button-process>
+                {% endblock %}
+
+            </template>
+        {% endblock %}
+
+        {% block aggro_entity_detail_language_switch %}
+            <template #language-switch>
+                <sw-language-switch
+                        :disabled="entityId == null || undefined"
+                        :save-changes-function="saveOnLanguageChange"
+                        :abort-change-function="abortOnLanguageChange"
+                        @on-change="onChangeLanguage"
+                />
+            </template>
+        {% endblock %}
+
+        {% block aggro_entity_detail_content %}
+            <template #content>
+                <sw-card-view>
+                    <template v-if="entityIsLoading">
+                        <sw-skeleton variant="detail-bold" />
+                        <sw-skeleton />
+                    </template>
+
+                    <template v-else>
+
+                        {% block aggro_entity_detail_content_language_info %}
+                            <sw-language-info
+                                    :entity-description="placeholder(entity, 'name', $tc('aggro.entity-detail.textHeadline'))"
+                            />
+                        {% endblock %}
+
+                        {% block aggro_entity_detail_content_tabs %}
+                            <sw-tabs
+                                    v-if="!isCreateMode"
+                                    class="aggro-entity-detail__tabs"
+                                    position-identifier="aggro-entity-detail-tabs"
+                                    :default-item="forms[0].ident"
+                            >
+
+                                <template #default="{ active }">
+                                    <sw-tabs-item
+                                            v-for="form in forms"
+                                            :key="`tab-item-${form.ident}`"
+                                            class="aggro-entity-detail__tab-item"
+                                            :name="form.ident"
+                                            :active-tab="active"
+                                    >
+                                        {{ $tc(form.title) }}
+                                    </sw-tabs-item>
+                                </template>
+
+                                <template #content="{ active }">
+                                    <template
+                                            v-for="form in forms"
+                                            :key="`tab-${form.ident}`"
+                                    >
+                                        <div
+                                                v-if="active === form.ident"
+                                                class="aggro-entity-detail__tab"
+                                        >
+                                            <sw-card
+                                                    v-for="card in form.cards"
+                                                    :key="`card-${card.ident}`"
+                                                    class="aggro-entity-detail__card"
+                                                    position-identifier="`aggro-entity-detail-tab-${card.ident}`"
+                                                    :title="$tc(card.title)"
+                                            >
+                                                <template v-if="!isLoading">
+                                                    <sw-container :columns="card.columns || '1fr'" gap="0px 30px">
+                                                        <sw-form-field-renderer
+                                                                v-for="field in card.fields"
+                                                                :key="field.ref"
+                                                                :type="field.type"
+                                                                :config="field.config"
+                                                                v-model:value="editEntity[field.ref]"
+                                                                v-model:entity-collection="editEntity[field.ref]"
+                                                                class="aggro-entity-detail__field"
+                                                        />
+                                                    </sw-container>
+                                                </template>
+                                            </sw-card>
+                                        </div>
+                                    </template>
+                                </template>
+                            </sw-tabs>
+                        {% endblock %}
+
+                        {% block aggro_entity_detail_custom_field_sets %}
+                            <sw-card
+                                    v-if="customFieldSets.length > 0"
+                                    position-identifier="aggro-entity-detail-custom-field-sets"
+                                    :title="$tc('sw-settings-custom-field.general.mainMenuItemGeneral')"
+                                    :is-loading="entityIsLoading"
+                            >
+                                <sw-custom-field-set-renderer
+                                        v-if="editEntity"
+                                        :entity="editEntity"
+                                        :sets="customFieldSets"
+                                        :disabled="!acl.can(entity+'.editor') || undefined"
+                                />
+                            </sw-card>
+                        {% endblock %}
+                    </template>
+                </sw-card-view>
+            </template>
+        {% endblock %}
+
+        {% block aggro_entity_detail_sidebar %}
+            <template #sidebar>
+                <sw-sidebar :propagate-width="true">
+                    <sw-sidebar-media-item
+                            ref="mediaSidebarItem"
+                            :disabled="!acl.can(entity+'.editor') || undefined"
+                    >
+                        <template
+                                #context-menu-items="media"
+                        >
+                            <sw-context-menu-item @click="setMediaFromSidebar(media.mediaItem)">
+                                {{ $tc('aggro.entity-detail.labelUseAsLogo') }}
+                            </sw-context-menu-item>
+                        </template>
+                    </sw-sidebar-media-item>
+                </sw-sidebar>
+            </template>
+        {% endblock %}
+
+    </sw-page>
+{% endblock %}

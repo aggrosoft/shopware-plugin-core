@@ -1,11 +1,15 @@
 import template from './entity-list.html.twig';
 const { Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
+const utils = Shopware.Utils;
+
 export default {
     template,
     props: {
-        entity: '',
-        header: 'Foo'
+        entity: String,
+        labels: Object,
+        links: Object,
+        columns: Array
     },
     inject: [
         'repositoryFactory',
@@ -64,10 +68,6 @@ export default {
             return this.getEntityColumns();
         },
 
-        listHeader() {
-            return this.header || this.entity;
-        },
-
         storeKey() {
             return 'aggro-plugin-core.filter.'+this.entity;
         },
@@ -79,7 +79,7 @@ export default {
 
             defaultCriteria.setTerm(this.term);
 
-            this.sortBy.split(',').forEach((sortBy) => {
+            this.sortBy.split(',').filter(f => f).forEach((sortBy) => {
                 defaultCriteria.addSorting(Criteria.sort(sortBy, this.sortDirection, this.naturalSorting));
             });
 
@@ -289,118 +289,7 @@ export default {
         },
 
         getEntityColumns() {
-            return [{
-                property: 'name',
-                dataIndex: 'lastName,firstName',
-                inlineEdit: 'string',
-                label: 'Name',
-                routerLink: 'aggro.entity.detail',
-                width: '250px',
-                allowResize: true,
-                primary: true,
-                useCustomSort: true,
-
-            }]
-
-            const columns = [
-                {
-                    property: 'firstName',
-                    dataIndex: 'lastName,firstName',
-                    inlineEdit: 'string',
-                    label: 'sw-customer.list.columnName',
-                    routerLink: 'sw.customer.detail',
-                    width: '250px',
-                    allowResize: true,
-                    primary: true,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'company',
-                    label: 'sw-customer.list.columnCompany',
-                    allowResize: true,
-                    visible: false,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'defaultBillingAddress.street',
-                    label: 'sw-customer.list.columnStreet',
-                    allowResize: true,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'defaultBillingAddress.zipcode',
-                    label: 'sw-customer.list.columnZip',
-                    align: 'right',
-                    allowResize: true,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'defaultBillingAddress.city',
-                    label: 'sw-customer.list.columnCity',
-                    allowResize: true,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'customerNumber',
-                    dataIndex: 'customerNumber',
-                    naturalSorting: true,
-                    label: 'sw-customer.list.columnCustomerNumber',
-                    allowResize: true,
-                    inlineEdit: 'string',
-                    align: 'right',
-                    useCustomSort: true,
-                },
-                {
-                    property: 'group',
-                    dataIndex: 'group',
-                    naturalSorting: true,
-                    label: 'sw-customer.list.columnGroup',
-                    allowResize: true,
-                    inlineEdit: 'string',
-                    align: 'right',
-                    useCustomSort: true,
-                },
-                {
-                    property: 'email',
-                    inlineEdit: 'string',
-                    label: 'sw-customer.list.columnEmail',
-                    allowResize: true,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'affiliateCode',
-                    inlineEdit: 'string',
-                    label: 'sw-customer.list.columnAffiliateCode',
-                    allowResize: true,
-                    visible: false,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'campaignCode',
-                    inlineEdit: 'string',
-                    label: 'sw-customer.list.columnCampaignCode',
-                    allowResize: true,
-                    visible: false,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'boundSalesChannelId',
-                    label: 'sw-customer.list.columnBoundSalesChannel',
-                    allowResize: true,
-                    visible: false,
-                    useCustomSort: true,
-                },
-                {
-                    property: 'active',
-                    inlineEdit: 'boolean',
-                    label: 'sw-customer.list.columnActive',
-                    allowResize: true,
-                    visible: false,
-                    useCustomSort: true,
-                },
-            ];
-
-            return columns;
+            return this.columns;
         },
 
         loadFilterValues() {

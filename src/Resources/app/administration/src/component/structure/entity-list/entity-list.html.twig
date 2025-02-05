@@ -16,7 +16,7 @@
             {% block aggro_entity_list_smart_bar_header_title %}
                 <h2>
                     {% block aggro_entity_list_smart_bar_header_title_text %}
-                        {{ listHeader }}
+                        {{ $tc(labels.header) }}
                     {% endblock %}
 
                     {% block aggro_entity_list_smart_bar_header_amount %}
@@ -43,10 +43,10 @@
             }"
                         class="aggro-entity-list__button-create"
                         variant="primary"
-                        :disabled="!acl.can('customer.creator') || undefined"
-                        :router-link="{ name: 'sw.customer.create' }"
+                        :disabled="!acl.can(entity+'.creator') || undefined"
+                        :router-link="{ name: links.create }"
                 >
-                    {{ $tc('sw-customer.list.buttonAddCustomer') }}
+                    {{ $tc(labels.add) }}
                 </sw-button>
             {% endblock %}
         </template>
@@ -70,7 +70,7 @@
                     :repository="entityRepository"
                     :sort-by="currentSortBy"
                     :sort-direction="sortDirection"
-                    detail-route="sw.customer.detail"
+                    :detail-route="links.detail"
                     :show-selection="acl.can(entity+'.deleter')"
                     :allow-inline-edit="acl.can(entity+'.editor') || undefined"
                     :allow-bulk-edit="acl.can(entity+'.editor')"
@@ -86,22 +86,13 @@
 
                 {% block aggro_entity_list_grid_columns_actions %}
                     <template #actions="{ item }">
-                        {% block aggro_entity_list_grid_columns_actions_view %}
-                            <sw-context-menu-item
-                                    class="aggro-entity-list__view-action"
-                                    :router-link="{ name: 'sw.customer.detail', params: { id: item.id }, query: { edit: false } }"
-                            >
-                                {{ $tc('sw-customer.list.contextMenuView') }}
-                            </sw-context-menu-item>
-                        {% endblock %}
-
                         {% block aggro_entity_list_grid_columns_actions_edit %}
                             <sw-context-menu-item
                                     class="aggro-entity-list__edit-action"
-                                    :disabled="!acl.can('customer.editor') || undefined"
-                                    :router-link="{ name: 'sw.customer.detail.base', params: { id: item.id }, query: { edit: true } }"
+                                    :disabled="!acl.can(entity+'.editor') || undefined"
+                                    :router-link="{ name: links.detail, params: { id: item.id }, query: { edit: true } }"
                             >
-                                {{ $tc('sw-customer.list.contextMenuEdit') }}
+                                {{ $tc('aggro.entity-list.contextMenuEdit') }}
                             </sw-context-menu-item>
                         {% endblock %}
 
@@ -109,10 +100,10 @@
                             <sw-context-menu-item
                                     class="aggro-entity-list__delete-action"
                                     variant="danger"
-                                    :disabled="!acl.can('customer.deleter') || undefined"
+                                    :disabled="!acl.can(entity+'.deleter') || undefined"
                                     @click="onDelete(item.id)"
                             >
-                                {{ $tc('sw-customer.list.contextMenuDelete') }}
+                                {{ $tc('aggro.entity-list.contextMenuDelete') }}
                             </sw-context-menu-item>
                         {% endblock %}
                     </template>
@@ -131,7 +122,7 @@
 
                         {% block aggro_entity_list_delete_modal_confirm_delete_text %}
                         <p class="aggro-entity-list__confirm-delete-text">
-                        {{ $tc('sw-customer.list.textDeleteConfirm', 0, { name: `${item.firstName} ${item.lastName}` }) }}
+                        {{ $tc('aggro.entity-list.textDeleteConfirm') }}
                     </p>
                     {% endblock %}
 
@@ -153,7 +144,7 @@
                                 size="small"
                                 @click="onConfirmDelete(item.id)"
                                 >
-                                {{ $tc('sw-customer.list.buttonDelete') }}
+                                {{ $tc('aggro.entity-list.buttonDelete') }}
                             </sw-button>
                             {% endblock %}
                         </template>
@@ -221,12 +212,12 @@
                     </sw-empty-state>
                     <sw-empty-state
                             v-else
-                            :title="$tc('sw-customer.list.messageEmpty')"
+                            :title="$tc('aggro.entity-list.messageEmpty')"
                     >
                         <template #icon>
                             <img
                                     :src="assetFilter('/administration/static/img/empty-states/customer-empty-state.svg')"
-                                    :alt="$tc('sw-customer.list.messageEmpty')"
+                                    :alt="$tc('aggro.entity-list.messageEmpty')"
                             >
                         </template>
                     </sw-empty-state>
@@ -242,7 +233,7 @@
                 {% block aggro_entity_list_sidebar_refresh %}
                     <sw-sidebar-item
                             icon="regular-undo"
-                            :title="$tc('sw-customer.list.titleSidebarItemRefresh')"
+                            :title="$tc('aggro.entity-list.titleSidebarItemRefresh')"
                             @click="onRefresh"
                     />
                 {% endblock %}

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
+use Shopware\Core\Framework\DataAbstractionLayer\AttributeMappingDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\AttributeTranslationDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\DataAbstractionLayerException;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\SchemaBuilder;
@@ -39,13 +40,13 @@ class MigrationQueryGenerator
         $originalTableSchema = $this->connection->createSchemaManager()->introspectTable($definition->getEntityName());
 
         // Indexes are not supported, so we remove them from both tables
-        $this->dropIndexes($originalTableSchema);
+        //$this->dropIndexes($originalTableSchema);
 
         $tableSchema = $this->schemaBuilder->buildSchemaOfDefinition($definition);
 
-        $cascadeDelete = $definition instanceof AttributeTranslationDefinition;
+        $cascadeDelete = $definition instanceof AttributeTranslationDefinition || $definition instanceof AttributeMappingDefinition;
 
-        $this->dropIndexes($tableSchema);
+        //$this->dropIndexes($tableSchema);
         $this->repairForeignKeys($tableSchema, $cascadeDelete);
 
 
@@ -59,9 +60,10 @@ class MigrationQueryGenerator
     private function getCreateTableQueries(EntityDefinition $definition): array
     {
         $tableSchema = $this->schemaBuilder->buildSchemaOfDefinition($definition);
-        $cascadeDelete = $definition instanceof AttributeTranslationDefinition;
+        $cascadeDelete = $definition instanceof AttributeTranslationDefinition || $definition instanceof AttributeMappingDefinition;
 
-        $this->dropIndexes($tableSchema);
+
+        //$this->dropIndexes($tableSchema);
         $this->repairForeignKeys($tableSchema, $cascadeDelete);
 
         return $this->getPlatform()->getCreateTableSQL($tableSchema, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS);
