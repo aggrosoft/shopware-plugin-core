@@ -252,5 +252,19 @@ export default {
         onCancel() {
             this.$router.push({ name: this.links.list });
         },
+
+        translatedConfig(config) {
+            return Object.assign({}, config, {
+                label: config.label ? this.$tc(config.label) : null,
+                placeholder: config.placeholder ? this.$tc(config.placeholder) : null,
+                helpText: config.helpText ? this.$tc(config.helpText) : null,
+                options: config.options ? config.options.map(option => {
+                    return {
+                        ...option,
+                        label: this.$tc(option.label),
+                    }
+                }) : null,
+            })
+        }
     },
 };

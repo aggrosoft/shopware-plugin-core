@@ -3,7 +3,7 @@
 
         {% block aggro_entity_detail_header %}
             <template #smart-bar-header>
-                <h2>{{ placeholder(entity, 'name', $tc('aggro.entity-detail.textHeadline')) }}</h2>
+                <h2>{{ placeholder(editEntity, 'name', $tc('aggro.entity-detail.textHeadline')) }}</h2>
             </template>
 
         {% endblock %}
@@ -106,7 +106,7 @@
                                                         <template v-for="field in card.fields" :key="field.ref">
                                                             <sw-form-field-renderer
                                                                 :type="field.type"
-                                                                :config="field.config"
+                                                                :config="translatedConfig(field.config)"
                                                                 v-if="field.condition ? field.condition(editEntity) : true"
                                                                 v-model:value="editEntity[field.ref]"
                                                                 v-model:entity-collection="editEntity[field.ref]"
