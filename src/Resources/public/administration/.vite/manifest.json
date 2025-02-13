@@ -1,0 +1,27 @@
+{
+  "component/structure/entity-detail/index.js": {
+    "file": "assets/index-DrrLsnot.js",
+    "name": "index",
+    "src": "component/structure/entity-detail/index.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/index-CQ_zqKMn.css"
+    ]
+  },
+  "component/structure/entity-list/index.js": {
+    "file": "assets/index-DzejbgfI.js",
+    "name": "index",
+    "src": "component/structure/entity-list/index.js",
+    "isDynamicEntry": true
+  },
+  "main.js": {
+    "file": "assets/aggro-plugin-core-plugin-25it1UvM.js",
+    "name": "aggro-plugin-core-plugin",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "component/structure/entity-list/index.js",
+      "component/structure/entity-detail/index.js"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "base": "/bundles/aggroplugincoreplugin/administration/",
+  "entryPoints": {
+    "aggro-plugin-core-plugin": {
+      "css": [],
+      "dynamic": [
+        "/bundles/aggroplugincoreplugin/administration/assets/index-DzejbgfI.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-DrrLsnot.js"
+      ],
+      "js": [
+        "/bundles/aggroplugincoreplugin/administration/assets/aggro-plugin-core-plugin-25it1UvM.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
