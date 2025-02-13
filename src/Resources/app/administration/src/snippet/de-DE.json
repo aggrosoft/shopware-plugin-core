@@ -1,8 +1,16 @@
 {
   "aggro": {
+    "entity-list": {
+      "messageEmpty": "Keine Einträge gefunden"
+    },
     "entity-detail": {
       "textHeadline": "Neuer Eintrag",
-      "buttonSave": "Speichern"
+      "buttonSave": "Speichern",
+      "editGridHeadline": "Neuer Eintrag",
+      "addOption": "Neuer Eintrag",
+      "contextMenuView": "Anzeigen",
+      "contextMenuDelete": "Löschen",
+      "optionEmptyStateSubline": "Füllen Sie die allgemeinen Informationen aus, speichern Sie anschließend bevor Sie neue Einträge anlegen können."
     }
   }
 }

@@ -1,7 +1,9 @@
 import template from './entity-detail.html.twig';
+import './entity-detail.scss';
 
 const {
     Mixin,
+    State,
     Data: { Criteria },
 } = Shopware;
 
@@ -45,6 +47,14 @@ export default {
             customFieldSets: [],
             isLoading: false,
             isSaveSuccessful: false,
+            gridSelection: {},
+            gridSortDirection: {},
+            gridSortBy: {},
+            gridSearchTerm: {},
+            gridLoading: {},
+            gridEditEntity: null,
+            editedGrid: null,
+            gridRefs: {},
         };
     },
 
@@ -55,6 +65,13 @@ export default {
     },
 
     computed: {
+        isSystemLanguage() {
+            return State.get('context').api.systemLanguageId === this.currentLanguage;
+        },
+
+        currentLanguage() {
+            return State.get('context').api.languageId;
+        },
         identifier() {
             return this.placeholder(this.editEntity, 'name');
         },
@@ -81,10 +98,14 @@ export default {
             const associations = [];
             for(const form of this.forms) {
                 for(const card of form.cards) {
-                    for(const field of card.fields){
-                        const prop = definition.properties[field.ref];
-                        if (prop && prop.type === 'association' && prop.relation === 'many_to_many'){
-                            associations.push(field.ref);
+                    if(card.grid) {
+                        associations.push(card.grid.ref);
+                    }else{
+                        for(const field of card.fields){
+                            const prop = definition.properties[field.ref];
+                            if (prop && prop.type === 'association' && prop.relation === 'many_to_many'){
+                                associations.push(field.ref);
+                            }
                         }
                     }
                 }
@@ -134,6 +155,9 @@ export default {
                 message: 'ESC',
                 appearance: 'light',
             };
+        },
+        assetFilter() {
+            return Shopware.Filter.getByName('asset');
         }
     },
 
@@ -254,6 +278,9 @@ export default {
         },
 
         translatedConfig(config) {
+            if (!config) {
+                return null;
+            }
             return Object.assign({}, config, {
                 label: config.label ? this.$tc(config.label) : null,
                 placeholder: config.placeholder ? this.$tc(config.placeholder) : null,
@@ -265,6 +292,118 @@ export default {
                     }
                 }) : null,
             })
+        },
+
+        gridPropertyDefinition(grid) {
+            const definition = Shopware.EntityDefinition.get(this.entity);
+            return definition.properties[grid.ref];
+        },
+
+        gridEntity(grid) {
+            const prop = this.gridPropertyDefinition(grid);
+            return prop?.entity;
+        },
+
+        gridRepository(grid) {
+            return this.repositoryFactory.create(this.gridEntity(grid));
+        },
+
+        getGridSortBy(grid) {
+            return this.gridSortBy[grid.ref] || 'name';
+        },
+
+        getGridSortDirection(grid) {
+            return this.gridSortDirection[grid.ref] || 'ASC';
+        },
+
+        onGridSearch(grid) {
+            this.editEntity[grid.ref].criteria.setTerm(this.gridSearchTerm[grid.ref]);
+            this.refreshGrid(grid);
+        },
+
+        onGridSelectionChanged(grid, selection) {
+            this.gridSelection[grid.ref] = selection && Object.values(selection).length ? selection : null;
+        },
+
+        onAddGridEntity(grid){
+            if (!this.isSystemLanguage) {
+                return false;
+            }
+
+
+            this.gridEditEntity = this.gridRepository(grid).create();
+
+            const prop = this.gridPropertyDefinition(grid);
+            this.gridEditEntity[prop.referenceField] = this.editEntity.id;
+
+            this.editedGrid = grid;
+
+            return true;
+        },
+
+        async onDeleteGridEntity(grid){
+
+            const selection = this.gridSelection[grid.ref];
+            const entities = Object.values(selection);
+
+            if (this.editEntity.isNew()) {
+                for(const entity of entities){
+                    this.editEntity[grid.ref].remove(entity.id);
+                }
+            }else{
+                for(const entity of entities){
+                    await this.gridRepository(grid).delete(entity.id);
+                }
+            }
+
+            this.refreshGrid(grid);
+        },
+
+        async onDeleteSingleGridEntity(grid, id){
+            await this.gridRepository(grid).delete(id);
+            this.refreshGrid(grid);
+        },
+
+        onEditGridEntity(grid,entity){
+            this.gridEditEntity = entity;
+            this.editedGrid = grid;
+        },
+
+        onCancelEditGridEntity(){
+            this.gridEditEntity = this.editedGrid = null;
+        },
+
+        onSaveGridEntity(){
+            const property = this.editedGrid.ref;
+            if (this.editEntity.isNew()) {
+                console.log('local new', this.gridEditEntity)
+                if (!this.editEntity[property].has(this.gridEditEntity.id)) {
+                    this.editEntity[property].add(this.gridEditEntity);
+                }
+                this.gridEditEntity = this.editedGrid = null;
+            }else{
+                this.gridRepository(this.editedGrid).save(this.gridEditEntity).then(() => {
+                    this.refreshGrid(this.editedGrid);
+                    this.gridEditEntity = this.editedGrid = null;
+                });
+            }
+
+        },
+
+        refreshGrid(grid) {
+
+            this.gridLoading[grid.ref] = true;
+            this.gridRefs[grid.ref].resetSelection();
+            this.gridRefs[grid.ref].load().then(() => {
+                this.gridLoading[grid.ref] = false;
+            });
+            /*
+            //this.isLoading = true;
+
+            this.$refs[grid.ref].load().then(() => {
+                this.isLoading = false;
+            });
+             */
         }
     },
 };

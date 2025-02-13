@@ -98,11 +98,47 @@
                                                     v-for="card in form.cards"
                                                     :key="`card-${card.ident}`"
                                                     class="aggro-entity-detail__card"
+                                                    :class="card.grid ? '--has-grid' : ''"
                                                     position-identifier="`aggro-entity-detail-tab-${card.ident}`"
                                                     :title="$tc(card.title)"
                                             >
                                                 <template v-if="!isLoading">
-                                                    <sw-container :columns="card.columns || '1fr'" gap="0px 30px">
+                                                    <div class="aggro-entity-detail__grid-toolbar" v-if="!editEntity.isNew() && card.grid">
+                                                        <sw-container
+                                                                columns="1fr 32px minmax(100px, 200px)"
+                                                                gap="0 10px"
+                                                        >
+                                                            <sw-simple-search-field
+                                                                    v-model:value="gridSearchTerm[card.grid.ref]"
+                                                                    size="small"
+                                                                    variant="form"
+                                                                    @search-term-change="onGridSearch(card.grid)"
+                                                            />
+                                                            <sw-button
+                                                                    square
+                                                                    size="small"
+                                                                    :disabled="!gridSelection[card.grid.ref] || gridSelection[card.grid.ref].length === 0"
+                                                                    class="aggro-entity-detail__grid-delete-button"
+                                                                    @click="onDeleteGridEntity(card.grid)"
+                                                            >
+                                                                <sw-icon
+                                                                        name="regular-trash"
+                                                                        small
+                                                                />
+                                                            </sw-button>
+
+                                                            <sw-container>
+                                                                <sw-button
+                                                                        size="small"
+                                                                        class="aggro-entity-detail__grid-add-button"
+                                                                        @click="onAddGridEntity(card.grid)"
+                                                                >
+                                                                    {{ $tc('aggro.entity-detail.addOption') }}
+                                                                </sw-button>
+                                                            </sw-container>
+                                                        </sw-container>
+                                                    </div>
+                                                    <sw-container :columns="card.columns || '1fr'" gap="0px 30px" v-if="card.fields">
                                                         <template v-for="field in card.fields" :key="field.ref">
                                                             <sw-form-field-renderer
                                                                 :type="field.type"
@@ -114,6 +150,109 @@
                                                             />
                                                         </template>
                                                     </sw-container>
+                                                </template>
+                                                <template #grid v-if="card.grid">
+                                                    <sw-empty-state
+                                                            v-if="editEntity.isNew()"
+                                                            title=""
+                                                            :subline="$tc('aggro.entity-detail.optionEmptyStateSubline')"
+                                                            :absolute="false"
+                                                    >
+                                                        <template #icon>
+                                                            <img
+                                                                    :src="assetFilter('/administration/static/img/empty-states/products-empty-state.svg')"
+                                                                    alt=""
+                                                            >
+                                                        </template>
+                                                    </sw-empty-state>
+                                                    <sw-one-to-many-grid
+                                                            v-else
+                                                            :ref="(el) => gridRefs[card.grid.ref] = el"
+                                                            :is-loading="gridLoading[card.grid.ref]"
+                                                            :collection="editEntity[card.grid.ref]"
+                                                            :data-source="editEntity[card.grid.ref]"
+                                                            :columns="card.grid.columns"
+                                                            :full-page="false"
+                                                            :local-mode="editEntity.isNew()"
+                                                            :allow-inline-edit="acl.can(gridEntity(card.grid)+'.editor')"
+                                                            :sort-by="getGridSortBy(card.grid)"
+                                                            :sort-direction="getGridSortDirection(card.grid)"
+                                                            @selection-change="onGridSelectionChanged(card.grid, $event)"
+                                                    >
+
+                                                        <template #column-name="{ item, isInlineEdit }">
+                                                            <template v-if="isInlineEdit">
+                                                                <sw-text-field
+                                                                        v-model:value="item.name"
+                                                                        size="small"
+                                                                />
+                                                            </template>
+
+                                                            <a
+                                                                    v-else
+                                                                    class="aggro-entity-detail__grid-detail-link"
+                                                                    role="button"
+                                                                    tabindex="0"
+                                                                    @click="onEditGridEntity(card.grid,item)"
+                                                                    @keydown.enter="onEditGridEntity(card.grid,item)"
+                                                            >
+                                                                {{ item.translated.name }}
+                                                            </a>
+                                                        </template>
+
+                                                        <template #more-actions="{ item }">
+                                                            <sw-context-menu-item
+                                                                    class="aggro-entity-detail__grid-edit-action"
+                                                                    :disabled="!acl.can(gridEntity(card.grid)+'.editor')"
+                                                                    @click="onEditGridEntity(card.grid,item)"
+                                                            >
+                                                                {{ $tc('aggro.entity-detail.contextMenuView') }}
+                                                            </sw-context-menu-item>
+                                                        </template>
+
+                                                        <template #delete-action="{ item }">
+                                                            <sw-context-menu-item
+                                                                    variant="danger"
+                                                                    :disabled="!acl.can(gridEntity(card.grid)+'.editor')"
+                                                                    @click="onDeleteSingleGridEntity(card.grid,item.id)"
+                                                            >
+                                                                {{ $tc('aggro.entity-detail.contextMenuDelete') }}
+                                                            </sw-context-menu-item>
+                                                        </template>
+                                                    </sw-one-to-many-grid>
+                                                    <sw-modal
+                                                        :title="gridEditEntity?.name ? gridEditEntity.name : $tc('aggro.entity-detail.editGridHeadline')"
+                                                        @modal-close="onCancelEditGridEntity"
+                                                        v-if="editedGrid?.ref === card.grid.ref && gridEditEntity"
+                                                    >
+                                                        <sw-container columns="1fr" gap="0px 30px">
+                                                            <template v-for="gridField in card.grid.fields" :key="gridField.ref">
+                                                                <sw-form-field-renderer
+                                                                    :type="gridField.type"
+                                                                    :config="translatedConfig(gridField.config)"
+                                                                    v-if="gridField.condition ? gridField.condition(editEntity, gridEditEntity) : true"
+                                                                    v-model:value="gridEditEntity[gridField.ref]"
+                                                                    v-model:entity-collection="gridEditEntity[gridField.ref]"
+                                                                    class="aggro-entity-detail__field"
+                                                                />
+                                                            </template>
+                                                        </sw-container>
+                                                        <template #modal-footer>
+                                                                <sw-button
+                                                                        size="small"
+                                                                        @click="onCancelEditGridEntity"
+                                                                >
+                                                                    {{ $tc('global.default.cancel') }}
+                                                                </sw-button>
+                                                                <sw-button
+                                                                        variant="primary"
+                                                                        size="small"
+                                                                        @click="onSaveGridEntity"
+                                                                >
+                                                                    {{ $tc('global.default.apply') }}
+                                                                </sw-button>
+                                                        </template>
+                                                    </sw-modal>
                                                 </template>
                                             </sw-card>
                                         </div>
