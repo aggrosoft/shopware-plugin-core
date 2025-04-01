@@ -105,6 +105,11 @@ export default {
                             const prop = definition.properties[field.ref];
                             if (prop && prop.type === 'association' && prop.relation === 'many_to_many'){
                                 associations.push(field.ref);
+                                if (field.associations) {
+                                    for(const fieldAssociation of field.associations){
+                                        associations.push(field.ref + '.' + fieldAssociation);
+                                    }
+                                }
                             }
                         }
                     }
@@ -189,7 +194,7 @@ export default {
                 entityResponse,
                 customFieldResponse,
             ] = await Promise.allSettled([
-                this.entityRepository.search(this.entityCriteria),
+                this.entityRepository.search(this.entityCriteria, { ...Shopware.Context.api, inheritance: true }),
                 this.customFieldSetRepository.search(this.customFieldSetCriteria),
             ]);
 
