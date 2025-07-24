@@ -100,6 +100,11 @@ export default {
                 for(const card of form.cards) {
                     if(card.grid) {
                         associations.push(card.grid.ref);
+                        if (card.grid.associations) {
+                            for(const fieldAssociation of card.grid.associations){
+                                associations.push(card.grid.ref + '.' + fieldAssociation);
+                            }
+                        }
                     }else{
                         for(const field of card.fields){
                             const prop = definition.properties[field.ref];
