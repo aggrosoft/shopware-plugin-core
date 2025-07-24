@@ -28,13 +28,25 @@ class EntityMigrator
                 $queries = array_merge($queries, $this->queryGenerator->generateQueries($relatedDefinition));
             }
 
+            $failedQueries = [];
+
             if (!empty($queries)) {
                 foreach($queries as $query){
                     try {
                         $this->connection->executeStatement($query);
                     }catch (\Exception $exception){
-                        throw new \Exception('Failed to execute query: ' . $query);
+                        $failedQueries[] = $query;
                     }
+                }
+            }
+        }
+
+        if(!empty($failedQueries)){
+            foreach ($failedQueries as $query){
+                try {
+                    $this->connection->executeStatement($query);
+                }catch (\Exception $exception){
+                    throw new \Exception("Query failed: $query");
                 }
             }
         }
