@@ -318,6 +318,16 @@ export default {
             return this.repositoryFactory.create(this.gridEntity(grid));
         },
 
+        gridColumnRenderers(grid) {
+            const renderers = {};
+            for (const column of grid.columns) {
+                if (column.renderer) {
+                    renderers[column.property] = column.renderer;
+                }
+            }
+            return renderers;
+        },
+
         getGridSortBy(grid) {
             return this.gridSortBy[grid.ref] || 'name';
         },

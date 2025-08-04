@@ -100,7 +100,7 @@
                                                     class="aggro-entity-detail__card"
                                                     :class="card.grid ? '--has-grid' : ''"
                                                     position-identifier="`aggro-entity-detail-tab-${card.ident}`"
-                                                    :title="$tc(card.title)"
+                                                    :title="card.title ? $tc(card.title) : ''"
                                             >
                                                 <template v-if="!isLoading">
                                                     <div class="aggro-entity-detail__grid-toolbar" v-if="!editEntity.isNew() && card.grid">
@@ -198,6 +198,13 @@
                                                             >
                                                                 {{ item.translated.name }}
                                                             </a>
+                                                        </template>
+
+                                                        <template
+                                                                v-for="(renderer, column) in gridColumnRenderers(card.grid)"
+                                                                #[`column-${column}`]="{ item }"
+                                                        >
+                                                            {{ renderer(item) }}
                                                         </template>
 
                                                         <template #more-actions="{ item }">

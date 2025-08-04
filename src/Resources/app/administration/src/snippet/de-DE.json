@@ -6,7 +6,7 @@
     "entity-detail": {
       "textHeadline": "Neuer Eintrag",
       "buttonSave": "Speichern",
-      "editGridHeadline": "Neuer Eintrag",
+      "editGridHeadline": "Eintrag bearbeiten",
       "addOption": "Neuer Eintrag",
       "contextMenuView": "Anzeigen",
       "contextMenuDelete": "Löschen",
