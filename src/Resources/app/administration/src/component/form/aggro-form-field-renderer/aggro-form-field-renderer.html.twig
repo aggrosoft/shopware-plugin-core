@@ -1,0 +1,10 @@
+{% block aggro_form_field_renderer %}
+<sw-form-field-renderer
+        :type="field.type"
+        :config="translatedConfig(field.config)"
+        v-if="field.condition ? field.condition(editEntity, gridEditEntity) : true"
+        v-model:value="modelValue"
+        v-model:entity-collection="modelValue"
+        class="aggro-entity-detail__field"
+/>
+{% endblock %}

@@ -36,6 +36,7 @@
         <template #smart-bar-actions>
             {% block aggro_entity_list_smart_bar_actions_add %}
                 <sw-button
+                        v-if="links.create"
                         v-tooltip="{
                 message: $tc('sw-privileges.tooltip.warning'),
                 disabled: acl.can(entity+'.creator'),

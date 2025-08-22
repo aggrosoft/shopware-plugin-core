@@ -38,7 +38,8 @@ export default {
         entity: String,
         labels: Object,
         links: Object,
-        forms: Object
+        forms: Object,
+        context: Object
     },
 
     data() {
@@ -108,6 +109,7 @@ export default {
                     }else{
                         for(const field of card.fields){
                             const prop = definition.properties[field.ref];
+                            console.log('Definition:', definition, 'Field:', field, 'Prop:', prop);
                             if (prop && prop.type === 'association' && prop.relation === 'many_to_many'){
                                 associations.push(field.ref);
                                 if (field.associations) {
@@ -119,7 +121,11 @@ export default {
                         }
                     }
                 }
+                for(const association of form.associations || []) {
+                    associations.push(association);
+                }
             }
+
             return associations;
         },
 
@@ -199,8 +205,8 @@ export default {
                 entityResponse,
                 customFieldResponse,
             ] = await Promise.allSettled([
-                this.entityRepository.search(this.entityCriteria, { ...Shopware.Context.api, inheritance: true }),
-                this.customFieldSetRepository.search(this.customFieldSetCriteria),
+                this.entityRepository.search(this.entityCriteria, { ...( this.context || Shopware.Context.api ), inheritance: true }),
+                this.customFieldSetRepository.search(this.customFieldSetCriteria, this.context || Shopware.Context.api),
             ]);
 
             if (entityResponse.status === 'fulfilled') {
@@ -260,7 +266,7 @@ export default {
             this.isLoading = true;
 
             this.entityRepository
-                .save(this.editEntity)
+                .save(this.editEntity, this.context || Shopware.Context.api)
                 .then(() => {
                     this.isLoading = false;
                     this.isSaveSuccessful = true;

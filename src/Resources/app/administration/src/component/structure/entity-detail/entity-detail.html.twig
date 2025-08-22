@@ -140,13 +140,9 @@
                                                     </div>
                                                     <sw-container :columns="card.columns || '1fr'" gap="0px 30px" v-if="card.fields">
                                                         <template v-for="field in card.fields" :key="field.ref">
-                                                            <sw-form-field-renderer
-                                                                :type="field.type"
-                                                                :config="translatedConfig(field.config)"
-                                                                v-if="field.condition ? field.condition(editEntity) : true"
-                                                                v-model:value="editEntity[field.ref]"
-                                                                v-model:entity-collection="editEntity[field.ref]"
-                                                                class="aggro-entity-detail__field"
+                                                            <aggro-form-field-renderer
+                                                                :field="field"
+                                                                :edit-entity="editEntity"
                                                             />
                                                         </template>
                                                     </sw-container>
@@ -234,13 +230,10 @@
                                                     >
                                                         <sw-container columns="1fr" gap="0px 30px">
                                                             <template v-for="gridField in card.grid.fields" :key="gridField.ref">
-                                                                <sw-form-field-renderer
-                                                                    :type="gridField.type"
-                                                                    :config="translatedConfig(gridField.config)"
-                                                                    v-if="gridField.condition ? gridField.condition(editEntity, gridEditEntity) : true"
-                                                                    v-model:value="gridEditEntity[gridField.ref]"
-                                                                    v-model:entity-collection="gridEditEntity[gridField.ref]"
-                                                                    class="aggro-entity-detail__field"
+                                                                <aggro-form-field-renderer
+                                                                        :field="gridField"
+                                                                        :edit-entity="editEntity"
+                                                                        :grid-edit-entity="gridEditEntity"
                                                                 />
                                                             </template>
                                                         </sw-container>

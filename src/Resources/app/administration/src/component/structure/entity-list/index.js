@@ -9,7 +9,10 @@ export default {
         entity: String,
         labels: Object,
         links: Object,
-        columns: Array
+        columns: Array,
+        associations: Array,
+        entityFilters: Array,
+        context: Object
     },
     inject: [
         'repositoryFactory',
@@ -82,6 +85,18 @@ export default {
             this.sortBy.split(',').filter(f => f).forEach((sortBy) => {
                 defaultCriteria.addSorting(Criteria.sort(sortBy, this.sortDirection, this.naturalSorting));
             });
+
+            if (this.associations) {
+                this.associations.forEach((association) => {
+                    defaultCriteria.addAssociation(association);
+                });
+            }
+
+            if (this.entityFilters) {
+                this.entityFilters.forEach((filter) => {
+                    defaultCriteria.addFilter(filter);
+                });
+            }
 
             /*
             defaultCriteria
@@ -256,7 +271,8 @@ export default {
             }
 
             try {
-                const items = await this.entityRepository.search(newCriteria);
+
+                const items = await this.entityRepository.search(newCriteria, this.context || Shopware.Context.api);
 
                 this.total = items.total;
                 this.entities = items;
