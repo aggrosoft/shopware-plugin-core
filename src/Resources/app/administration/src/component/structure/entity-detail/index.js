@@ -106,7 +106,7 @@ export default {
                                 associations.push(card.grid.ref + '.' + fieldAssociation);
                             }
                         }
-                    }else{
+                    }else if(card.fields){
                         for(const field of card.fields){
                             const prop = definition.properties[field.ref];
                             console.log('Definition:', definition, 'Field:', field, 'Prop:', prop);

@@ -146,6 +146,7 @@
                                                             />
                                                         </template>
                                                     </sw-container>
+                                                    <component :is="card.component" v-if="card.component" :edit-entity="editEntity" />
                                                 </template>
                                                 <template #grid v-if="card.grid">
                                                     <sw-empty-state
