@@ -23,6 +23,7 @@
 
                 {% block aggro_entity_detail_actions_save %}
                     <sw-button-process
+                            v-if="!actions || !actions.length"
                             v-model:process-success="isSaveSuccessful"
                             v-tooltip.bottom="tooltipSave"
                             class="aggro-entity-detail__save-action"
@@ -33,6 +34,48 @@
                     >
                         {{ $tc('aggro.entity-detail.buttonSave') }}
                     </sw-button-process>
+                {% endblock %}
+
+                {% block aggro_entity_detail_custom_actions %}
+                <sw-button-group v-else class="aggro-entity-detail__custom-actions" :split-button="true">
+                    <sw-button-process
+                            v-model:process-success="isSaveSuccessful"
+                            v-tooltip.bottom="tooltipSave"
+                            class="aggro-entity-detail__save-action"
+                            :is-loading="isLoading"
+                            :disabled="isLoading || !acl.can(entity+'.editor') || undefined"
+                            variant="primary"
+                            @click.prevent="onSave"
+                    >
+                        {{ $tc('aggro.entity-detail.buttonSave') }}
+                    </sw-button-process>
+                    <sw-context-button>
+                        <template #button>
+                            <sw-button
+                                    class="aggro-entity-detail__button-context-menu"
+                                    square
+                                    variant="primary"
+                            >
+                                <sw-icon
+                                        name="regular-chevron-down-xs"
+                                        size="16"
+                                />
+                            </sw-button>
+                        </template>
+
+                        {% block sw_product_detail_actions_save_context_menu_actions %}
+                            {% block sw_product_detail_actions_duplicate %}
+                                <sw-context-menu-item
+                                        v-for="action in actions"
+                                        v-bind="action.props"
+                                        @click="action.onClick(editEntity, this)"
+                                >
+                                    {{ $tc(action.label) }}
+                                </sw-context-menu-item>
+                            {% endblock %}
+                        {% endblock %}
+                    </sw-context-button>
+                </sw-button-group>
                 {% endblock %}
 
             </template>
@@ -276,6 +319,18 @@
                                         :disabled="!acl.can(entity+'.editor') || undefined"
                                 />
                             </sw-card>
+                        {% endblock %}
+
+                        {% block aggro_entity_detail_modals %}
+                            <template v-for="modal in modals">
+                                <component
+                                        v-if="modalIsOpen(modal.ident)"
+                                        v-bind="modal.props"
+                                        :is="modal.component"
+                                        :edit-entity="editEntity"
+                                        @modal-close="closeModal(modal.ident)"
+                                />
+                            </template>
                         {% endblock %}
                     </template>
                 </sw-card-view>

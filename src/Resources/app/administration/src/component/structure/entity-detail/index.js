@@ -36,6 +36,8 @@ export default {
             default: null,
         },
         entity: String,
+        actions: Object,
+        modals: Object,
         labels: Object,
         links: Object,
         forms: Object,
@@ -48,6 +50,7 @@ export default {
             customFieldSets: [],
             isLoading: false,
             isSaveSuccessful: false,
+            openModals: {},
             gridSelection: {},
             gridSortDirection: {},
             gridSortBy: {},
@@ -430,6 +433,20 @@ export default {
                 this.isLoading = false;
             });
              */
+        },
+
+        modalIsOpen(ident) {
+            return this.openModals[ident] === true;
+        },
+
+        openModal(ident) {
+            this.$set(this.openModals, ident, true);
+            console.log('openModal', ident, this.openModals);
+        },
+
+        closeModal(ident) {
+            this.$set(this.openModals, ident, false);
+            console.log('closeModal', ident, this.openModals);
         }
     },
 };
