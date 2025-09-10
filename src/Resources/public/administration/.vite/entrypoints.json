@@ -1,0 +1,25 @@
+{
+  "base": "/bundles/aggroplugincoreplugin/administration/",
+  "entryPoints": {
+    "aggro-plugin-core-plugin": {
+      "css": [
+        "/bundles/aggroplugincoreplugin/administration/css/aggro-plugin-core-plugin.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/bundles/aggroplugincoreplugin/administration/js/aggro-plugin-core-plugin.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.0.4",
+    7,
+    0,
+    4
+  ],
+  "viteServer": null
+}
