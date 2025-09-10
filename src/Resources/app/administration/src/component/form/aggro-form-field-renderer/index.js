@@ -50,5 +50,11 @@ export default {
                 }) : null,
             })
         },
+        isDisabled(field) {
+            if (field.disabled) {
+                return field.disabled(this.editEntity, this.gridEditEntity);
+            }
+            return false;
+        }
     }
 }

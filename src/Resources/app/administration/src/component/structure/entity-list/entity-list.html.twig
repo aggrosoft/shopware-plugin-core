@@ -61,7 +61,7 @@
         {% block aggro_entity_list_content %}
         <div class="aggro-entity-list__content">
             {% block aggro_entity_list_grid %}
-            <sw-entity-listing
+            <aggro-entity-listing
                     v-if="isLoading || (entities && entitySearchable)"
                     ref="aggroEntityGrid"
                     class="aggro-entity-list-grid"
@@ -184,7 +184,7 @@
                         </sw-bulk-edit-modal>
                     </template>
                 {% endblock %}
-            </sw-entity-listing>
+            </aggro-entity-listing>
             {% endblock %}
 
             {% block aggro_entity_list_empty_state %}

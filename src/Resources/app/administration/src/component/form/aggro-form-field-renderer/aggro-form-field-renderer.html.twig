@@ -2,6 +2,7 @@
 <sw-form-field-renderer
         :type="field.type"
         :config="translatedConfig(field.config)"
+        :disabled="isDisabled(field)"
         v-if="field.condition ? field.condition(editEntity, gridEditEntity) : true"
         v-model:value="modelValue"
         v-model:entity-collection="modelValue"

@@ -144,6 +144,7 @@
                                                     :class="card.grid ? '--has-grid' : ''"
                                                     position-identifier="`aggro-entity-detail-tab-${card.ident}`"
                                                     :title="card.title ? $tc(card.title) : ''"
+                                                    :content-padding="card.contentPadding !== false"
                                             >
                                                 <template v-if="!isLoading">
                                                     <div class="aggro-entity-detail__grid-toolbar" v-if="!editEntity.isNew() && card.grid">

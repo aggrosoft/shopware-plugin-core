@@ -1,0 +1,39 @@
+{% block sw_data_grid_columns_value %}
+    <template v-else>
+        {% block sw_data_grid_columns_render_router_link %}
+            <router-link
+                    v-if="column.routerLink"
+                    class="sw-data-grid__cell-value"
+                    :to="{ name: column.routerLink, params: { id: item.id } }"
+            >
+                <component
+                    v-if="column.component"
+                    :is="column.component"
+                    :item="item"
+                    :column="column"
+                    :value="renderColumn(item, column)"
+                    />
+                <span v-else>
+                    {{ renderColumn(item, column) }}
+                </span>
+            </router-link>
+        {% endblock %}
+        {% block sw_data_grid_columns_render_value %}
+            <span
+                    v-else
+                    class="sw-data-grid__cell-value"
+            >
+                <component
+                        v-if="column.component"
+                        :is="column.component"
+                        :item="item"
+                        :column="column"
+                        :value="renderColumn(item, column)"
+                />
+                <span v-else>
+                    {{ renderColumn(item, column) }}
+                </span>
+            </span>
+        {% endblock %}
+    </template>
+{% endblock %}
