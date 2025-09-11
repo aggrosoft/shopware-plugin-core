@@ -10,6 +10,7 @@ export default {
         labels: Object,
         links: Object,
         columns: Array,
+        filters: Object,
         associations: Array,
         entityFilters: Array,
         context: Object
@@ -36,21 +37,6 @@ export default {
             showDeleteModal: false,
             filterLoading: false,
             filterCriteria: [],
-            defaultFilters: [
-                /*
-                'customer-number-filter',
-                'affiliate-code-filter',
-                'campaign-code-filter',
-                'customer-group-request-filter',
-                'salutation-filter',
-                'account-status-filter',
-                'default-payment-method-filter',
-                'group-filter',
-                'billing-address-country-filter',
-                'shipping-address-country-filter',
-                'tags-filter',
-                 */
-            ],
             activeFilterNumber: 0,
             searchConfigEntity: 'customer',
             showBulkEditModal: false,
@@ -129,84 +115,28 @@ export default {
         },
 
         listFilterOptions() {
-
-            return {};
-
-            const options = {
-                'customer-number-filter': {
-                    property: 'customerNumber',
-                    type: 'string-filter',
-                    label: this.$tc('sw-customer.filter.customerNumber.label'),
-                    placeholder: this.$tc('sw-customer.filter.customerNumber.placeholder'),
-                    valueProperty: 'key',
-                    labelProperty: 'key',
-                    criteriaFilterType: 'equals',
-                },
-                'affiliate-code-filter': {
-                    property: 'affiliateCode',
-                    type: 'multi-select-filter',
-                    label: this.$tc('sw-customer.filter.affiliateCode.label'),
-                    placeholder: this.$tc('sw-customer.filter.affiliateCode.placeholder'),
-                    valueProperty: 'key',
-                    labelProperty: 'key',
-                    options: this.availableAffiliateCodes,
-                },
-                'campaign-code-filter': {
-                    property: 'campaignCode',
-                    type: 'multi-select-filter',
-                    label: this.$tc('sw-customer.filter.campaignCode.label'),
-                    placeholder: this.$tc('sw-customer.filter.campaignCode.placeholder'),
-                    valueProperty: 'key',
-                    labelProperty: 'key',
-                    options: this.availableCampaignCodes,
-                },
-                'customer-group-request-filter': {
-                    property: 'requestedGroupId',
-                    type: 'existence-filter',
-                    label: this.$tc('sw-customer.filter.customerGroupRequest.label'),
-                    placeholder: this.$tc('sw-customer.filter.customerGroupRequest.placeholder'),
-                    optionHasCriteria: this.$tc('sw-customer.filter.customerGroupRequest.textHasCriteria'),
-                    optionNoCriteria: this.$tc('sw-customer.filter.customerGroupRequest.textNoCriteria'),
-                },
-                'salutation-filter': {
-                    property: 'salutation',
-                    label: this.$tc('sw-customer.filter.salutation.label'),
-                    placeholder: this.$tc('sw-customer.filter.salutation.placeholder'),
-                    labelProperty: 'displayName',
-                },
-                'account-status-filter': {
-                    property: 'active',
-                    label: this.$tc('sw-customer.filter.status.label'),
-                    placeholder: this.$tc('sw-customer.filter.status.placeholder'),
-                },
-                'group-filter': {
-                    property: 'group',
-                    label: this.$tc('sw-customer.filter.customerGroup.label'),
-                    placeholder: this.$tc('sw-customer.filter.customerGroup.placeholder'),
-                },
-                'billing-address-country-filter': {
-                    property: 'defaultBillingAddress.country',
-                    label: this.$tc('sw-customer.filter.billingCountry.label'),
-                    placeholder: this.$tc('sw-customer.filter.billingCountry.placeholder'),
-                },
-                'shipping-address-country-filter': {
-                    property: 'defaultShippingAddress.country',
-                    label: this.$tc('sw-customer.filter.shippingCountry.label'),
-                    placeholder: this.$tc('sw-customer.filter.shippingCountry.placeholder'),
-                },
-                'tags-filter': {
-                    property: 'tags',
-                    label: this.$tc('sw-customer.filter.tags.label'),
-                    placeholder: this.$tc('sw-customer.filter.tags.placeholder'),
-                },
-            };
-
-
-            return options;
+            return this.filters || {};
+            const result = this.filters?.map(filter => {
+                console.log('filter', filter, {...filter});
+                return {
+                    ...filter,
+                    label: this.$tc(filter.label),
+                    placeholder: this.$tc(filter.placeholder),
+                    options: filter.options?.map(option => ({
+                        ...option,
+                        label: this.$tc(option.label)
+                    }))
+                }
+            }) || {};
+            return result;
         },
 
         listFilters() {
             return this.filterFactory.create(this.entity, this.listFilterOptions);
+        },
+
+        defaultFilters() {
+            return this.listFilters ? this.listFilters.map(filter => filter.name) : [];
         },
 
         assetFilter() {
@@ -257,7 +187,7 @@ export default {
 
             const newCriteria = await this.addQueryScores(this.term, criteria);
 
-            this.activeFilterNumber = criteria.filters?.length || 0;
+            this.activeFilterNumber = criteria.filters?.length - this.entityFilters?.length || 0;
 
             if (!this.entitySearchable) {
                 this.isLoading = false;
