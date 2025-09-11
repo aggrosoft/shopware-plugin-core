@@ -241,6 +241,7 @@
 
                 {% block aggro_entity_list_sidebar_filter %}
                     <sw-sidebar-filter-panel
+                            v-if="defaultFilters && defaultFilters.length"
                             :entity="entity"
                             :store-key="storeKey"
                             :filters="listFilters"

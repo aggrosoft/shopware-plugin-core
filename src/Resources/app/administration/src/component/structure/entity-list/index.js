@@ -38,7 +38,7 @@ export default {
             filterLoading: false,
             filterCriteria: [],
             activeFilterNumber: 0,
-            searchConfigEntity: 'customer',
+            searchConfigEntity: null,
             showBulkEditModal: false,
         };
     },
@@ -132,7 +132,18 @@ export default {
         },
 
         listFilters() {
-            return this.filterFactory.create(this.entity, this.listFilterOptions);
+            const filters = this.filterFactory.create(this.entity, this.listFilterOptions);
+            for (const filter of filters) {
+                filter.label = this.$tc(filter.label);
+                filter.placeholder = this.$tc(filter.placeholder);
+                if (filter.options) {
+                    filter.options = filter.options.map(option => ({
+                        ...option,
+                        label: this.$tc(option.label)
+                    }));
+                }
+            }
+            return filters;
         },
 
         defaultFilters() {
@@ -159,6 +170,7 @@ export default {
 
     methods: {
         createdComponent() {
+            this.searchConfigEntity = this.entity;
             return this.loadFilterValues();
         },
 
