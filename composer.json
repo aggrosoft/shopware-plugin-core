@@ -3,7 +3,7 @@
   "description": "Shopware Plugin Core",
   "type": "shopware-platform-plugin",
   "license": "MIT",
-  "version": "3.7.2",
+  "version": "3.8.0",
   "autoload": {
     "psr-4": {
       "AggroPluginCore\\": "src/"
