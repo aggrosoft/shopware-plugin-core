@@ -2,6 +2,7 @@
     v-bind="$attrs"
     v-bind:value="value"
     v-on="$listeners"
+    :criteria="criteriaWithVariation"
 >
     <template #selection-label-property="{ item }">
         <sw-product-variant-info

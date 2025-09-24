@@ -1,5 +1,12 @@
 import template from './aggro-product-multi-select.html.twig'
 
 export default {
-    template
+    template,
+    computed: {
+        criteriaWithVariation() {
+            const criteria = this.criteria || new Shopware.Data.Criteria(1, this.resultLimit || 25);
+            criteria.addAssociation('options.group');
+            return criteria;
+        }
+    }
 }
