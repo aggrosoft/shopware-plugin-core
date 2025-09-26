@@ -22,5 +22,11 @@
             <argument type="service" id="custom_field_set_relation.repository"/>
         </service>
 
+        <service id="AggroPluginCore\Core\Content\SalesChannel\Listing\Processor\PagingListingProcessor" public="true">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument>%shopware.api.store.max_limit%</argument>
+        </service>
+
+
     </services>
 </container>
