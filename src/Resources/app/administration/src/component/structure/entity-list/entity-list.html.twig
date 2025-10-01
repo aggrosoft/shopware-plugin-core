@@ -68,6 +68,7 @@
                     identifier="aggro-entity-list"
                     :items="entities"
                     :columns="entityColumns"
+                    :groupBy="groupBy"
                     :repository="entityRepository"
                     :sort-by="currentSortBy"
                     :sort-direction="sortDirection"
@@ -81,6 +82,7 @@
                     @inline-edit-save="onInlineEditSave"
                     @page-change="onPageChange"
                     @column-sort="onSortColumn"
+                    @update:groupBy="onUpdateGroupBy"
                     @bulk-edit-modal-open="onBulkEditModalOpen"
             >
 

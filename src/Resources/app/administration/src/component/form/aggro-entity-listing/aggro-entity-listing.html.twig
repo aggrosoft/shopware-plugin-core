@@ -37,3 +37,15 @@
         {% endblock %}
     </template>
 {% endblock %}
+
+{% block sw_data_grid_settings_additional_settings_inner %}
+    {% parent %}
+    <sw-multi-select
+        v-if="groupableColumns.length > 0"
+        :label="$t('sw-data-grid.settings.groupBy')"
+        :options="groupableColumns"
+        label-property="label"
+        value-property="property"
+        v-model:value="currentGroupBy"
+    />
+{% endblock %}

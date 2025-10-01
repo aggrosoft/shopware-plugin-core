@@ -8,7 +8,10 @@ export default {
     props: {
         entity: String,
         labels: Object,
-        links: Object,
+        links: {
+            type: Object,
+            default: () => ({}),
+        },
         columns: Array,
         filters: Object,
         associations: Array,
@@ -37,6 +40,7 @@ export default {
             showDeleteModal: false,
             filterLoading: false,
             filterCriteria: [],
+            groupBy: [],
             activeFilterNumber: 0,
             searchConfigEntity: null,
             showBulkEditModal: false,
@@ -116,26 +120,13 @@ export default {
 
         listFilterOptions() {
             return this.filters || {};
-            const result = this.filters?.map(filter => {
-                console.log('filter', filter, {...filter});
-                return {
-                    ...filter,
-                    label: this.$tc(filter.label),
-                    placeholder: this.$tc(filter.placeholder),
-                    options: filter.options?.map(option => ({
-                        ...option,
-                        label: this.$tc(option.label)
-                    }))
-                }
-            }) || {};
-            return result;
         },
 
         listFilters() {
             const filters = this.filterFactory.create(this.entity, this.listFilterOptions);
             for (const filter of filters) {
-                filter.label = this.$tc(filter.label);
-                filter.placeholder = this.$tc(filter.placeholder);
+                filter.label = filter.label ? this.$tc(filter.label) : null;
+                filter.placeholder = filter.placeholder ? this.$tc(filter.placeholder) : null;
                 if (filter.options) {
                     filter.options = filter.options.map(option => ({
                         ...option,
@@ -212,6 +203,15 @@ export default {
                 newCriteria.resetSorting();
             }
 
+            if(this.groupBy?.length) {
+                this.addGrouping(newCriteria);
+            }
+
+            /*newCriteria.addGrouping('customerId');
+            newCriteria.addAggregation(
+                Criteria.terms('customers', 'customerId', null, null, Criteria.sum('quantity','quantity'))
+            );*/
+
             try {
 
                 const items = await this.entityRepository.search(newCriteria, this.context || Shopware.Context.api);
@@ -220,9 +220,20 @@ export default {
                 this.entities = items;
                 this.isLoading = false;
                 this.selection = {};
+                console.log(items);
             } catch {
                 this.isLoading = false;
             }
+        },
+
+        addGrouping(criteria) {
+            const groupingColumns = this.columns.filter(column => column.grouping);
+            this.groupBy.forEach(group => {
+                criteria.addGrouping(group);
+                groupingColumns.forEach(column => {
+                    criteria.addAggregation(Criteria.terms(group+'-'+column.property, group, null, null, column.grouping));
+                })
+            });
         },
 
         onDelete(id) {
@@ -282,5 +293,10 @@ export default {
         onBulkEditModalClose() {
             this.showBulkEditModal = false;
         },
+
+        onUpdateGroupBy(event) {
+            this.groupBy = event;
+            this.getList();
+        }
     },
 }
