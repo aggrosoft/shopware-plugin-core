@@ -23,6 +23,15 @@
                     v-else
                     class="sw-data-grid__cell-value"
             >
+                <sw-button
+                        v-if="isGroupedColumn(column)"
+                        size="x-small"
+                        variant="context"
+                        @click="toggleItemExpand(item, column)"
+                >
+                    <sw-icon :name="isItemColumnExpanded(item, column) ? 'regular-minus-square-s' : 'regular-plus-square-s'" small></sw-icon>
+                </sw-button>
+
                 <component
                         v-if="column.component"
                         :is="column.component"
@@ -48,4 +57,25 @@
         value-property="property"
         v-model:value="currentGroupBy"
     />
+{% endblock %}
+
+
+{% block sw_data_grid_header_columns_label %}
+    <template v-else>
+        <span v-if="isSumColumn(column)" class="sw-data-grid__column-actions-sum">
+            &sum;
+        </span>
+        {{ $te((column.label ?? 'undefined')) ? $tc(column.label) : column.label }}
+    </template>
+{% endblock %}
+
+{% block sw_data_grid_column_actions %}
+    {% parent %}
+
+    <sw-icon
+            v-if="isGroupedColumn(column)"
+            name="regular-shuffle"
+            size="14px"
+    >
+    </sw-icon>
 {% endblock %}

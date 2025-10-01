@@ -12,5 +12,10 @@
       "contextMenuDelete": "Löschen",
       "optionEmptyStateSubline": "Füllen Sie die allgemeinen Informationen aus, speichern Sie anschließend bevor Sie neue Einträge anlegen können."
     }
+  },
+  "sw-data-grid": {
+    "settings": {
+      "groupBy": "Gruppieren nach"
+    }
   }
 }

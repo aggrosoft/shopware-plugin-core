@@ -190,6 +190,7 @@ export default {
 
             const newCriteria = await this.addQueryScores(this.term, criteria);
 
+
             this.activeFilterNumber = criteria.filters?.length - this.entityFilters?.length || 0;
 
             if (!this.entitySearchable) {
@@ -297,6 +298,31 @@ export default {
         onUpdateGroupBy(event) {
             this.groupBy = event;
             this.getList();
+        },
+
+        async onItemExpand(item, column) {
+            const criteria = await Shopware.Service('filterService').mergeWithStoredFilters(
+                this.storeKey,
+                this.defaultCriteria,
+            );
+
+            const newCriteria = await this.addQueryScores(this.term, criteria);
+            newCriteria.page = 1;
+            newCriteria.limit = 500;
+
+            const property = column.property;
+            const value = item[property];
+            newCriteria.addFilter(Criteria.equals(property, value));
+
+
+            const items = await this.entityRepository.search(newCriteria, this.context || Shopware.Context.api);
+            // append items after the current item
+            const parentIndex = this.entities.indexOf(item);
+            if (parentIndex !== -1) {
+                this.entities.splice(parentIndex + 1, 0, ...items);
+                console.log(this.entities);
+            }
+
         }
     },
 }
