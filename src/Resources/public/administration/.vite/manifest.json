@@ -1,0 +1,11 @@
+{
+  "main.js": {
+    "file": "js/aggro-plugin-core-plugin.js",
+    "name": "aggro-plugin-core-plugin",
+    "src": "main.js",
+    "isEntry": true,
+    "css": [
+      "css/aggro-plugin-core-plugin.css"
+    ]
+  }
+}
