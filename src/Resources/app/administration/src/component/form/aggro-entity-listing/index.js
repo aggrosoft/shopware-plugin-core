@@ -58,6 +58,10 @@ export default {
                     }
                 }
             }
+            if (column.renderFunction) {
+                const renderedValue = this.$super('renderColumn', item, column);
+                return column.renderFunction(item, column, renderedValue);
+            }
             return this.$super('renderColumn', item, column);
         },
         isGroupedColumn(column) {

@@ -262,7 +262,7 @@
     </tr>
     <tr class="sw-data-grid__child-row" v-if="childItems[item.id] && isItemExpanded(item)">
         <td :colspan="currentVisibleColumns.length + 3">
-            <sw-entity-listing
+            <aggro-entity-listing
                 :columns="columns"
                 :items="childItems[item.id]"
                 :repository="repository"
