@@ -44,6 +44,7 @@ export default {
             activeFilterNumber: 0,
             searchConfigEntity: null,
             showBulkEditModal: false,
+            childItems: {},
         };
     },
     metaInfo() {
@@ -219,6 +220,7 @@ export default {
 
                 this.total = items.total;
                 this.entities = items;
+                this.childItems = {};
                 this.isLoading = false;
                 this.selection = {};
                 console.log(items);
@@ -308,21 +310,19 @@ export default {
 
             const newCriteria = await this.addQueryScores(this.term, criteria);
             newCriteria.page = 1;
-            newCriteria.limit = 500;
 
             const property = column.property;
             const value = item[property];
             newCriteria.addFilter(Criteria.equals(property, value));
 
+            this.childItems[item.id] = await this.entityRepository.search(newCriteria, this.context || Shopware.Context.api);
+        },
 
-            const items = await this.entityRepository.search(newCriteria, this.context || Shopware.Context.api);
-            // append items after the current item
-            const parentIndex = this.entities.indexOf(item);
-            if (parentIndex !== -1) {
-                this.entities.splice(parentIndex + 1, 0, ...items);
-                console.log(this.entities);
+        onItemCollapse(item, column) {
+            if(!this.childItems[item.id]) {
+                return;
             }
-
+            this.childItems[item.id] = null;
         }
     },
 }

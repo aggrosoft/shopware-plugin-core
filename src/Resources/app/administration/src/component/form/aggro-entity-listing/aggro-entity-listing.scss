@@ -5,3 +5,10 @@
 .sw-data-grid .sw-data-grid__cell--grouped {
   background-color: #fffceb;
 }
+
+.sw-data-grid .sw-data-grid__child-row > td {
+  padding: 15px;
+  box-shadow: inset 0px 0px 15px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 20;
+}

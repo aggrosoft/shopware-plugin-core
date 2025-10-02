@@ -67,6 +67,7 @@
                     class="aggro-entity-list-grid"
                     identifier="aggro-entity-list"
                     :items="entities"
+                    :child-items="childItems"
                     :columns="entityColumns"
                     :groupBy="groupBy"
                     :repository="entityRepository"
@@ -85,6 +86,7 @@
                     @update:groupBy="onUpdateGroupBy"
                     @bulk-edit-modal-open="onBulkEditModalOpen"
                     @item-expand="onItemExpand"
+                    @item-collapse="onItemCollapse"
             >
 
 

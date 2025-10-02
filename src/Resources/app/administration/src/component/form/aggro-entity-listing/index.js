@@ -7,6 +7,11 @@ export default {
         groupBy: {
             type: Array,
             required: false
+        },
+        childItems: {
+            type: Object,
+            required: false,
+            default: () => ({})
         }
     },
     data: function () {
@@ -32,12 +37,13 @@ export default {
         },
         isGrouped() {
             return this.groupBy?.length > 0;
-        },
-        totalColumns() {
-            return this.currentVisibleColumns.length + (this.showSelection ? 1 : 0);
         }
     },
     methods: {
+        applyResult(result) {
+            this.$super('applyResult', result);
+            this.expandedItems = {};
+        },
         renderColumn: function (item, column) {
             if (this.groupBy?.length) {
                 if (!column.grouping && !column.groupable) {
@@ -69,6 +75,7 @@ export default {
         toggleItemExpand(item, column) {
             if(this.expandedItems[item.id]) {
                 this.$set(this.expandedItems, item.id, false);
+                this.$emit('item-collapse', item, column);
             }else{
                 this.$set(this.expandedItems, item.id, column.property);
                 this.$emit('item-expand', item, column);

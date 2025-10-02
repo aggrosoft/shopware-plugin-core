@@ -1,51 +1,4 @@
-{% block sw_data_grid_columns_value %}
-    <template v-else>
-        {% block sw_data_grid_columns_render_router_link %}
-            <router-link
-                    v-if="column.routerLink"
-                    class="sw-data-grid__cell-value"
-                    :to="{ name: column.routerLink, params: { id: item.id } }"
-            >
-                <component
-                    v-if="column.component"
-                    :is="column.component"
-                    :item="item"
-                    :column="column"
-                    :value="renderColumn(item, column)"
-                    />
-                <span v-else>
-                    {{ renderColumn(item, column) }}
-                </span>
-            </router-link>
-        {% endblock %}
-        {% block sw_data_grid_columns_render_value %}
-            <span
-                    v-else
-                    class="sw-data-grid__cell-value"
-            >
-                <sw-button
-                        v-if="isGroupedColumn(column)"
-                        size="x-small"
-                        variant="context"
-                        @click="toggleItemExpand(item, column)"
-                >
-                    <sw-icon :name="isItemColumnExpanded(item, column) ? 'regular-minus-square-s' : 'regular-plus-square-s'" small></sw-icon>
-                </sw-button>
 
-                <component
-                        v-if="column.component"
-                        :is="column.component"
-                        :item="item"
-                        :column="column"
-                        :value="renderColumn(item, column)"
-                />
-                <span v-else>
-                    {{ renderColumn(item, column) }}
-                </span>
-            </span>
-        {% endblock %}
-    </template>
-{% endblock %}
 
 {% block sw_data_grid_settings_additional_settings_inner %}
     {% parent %}
@@ -78,4 +31,244 @@
             size="14px"
     >
     </sw-icon>
+{% endblock %}
+
+{% block sw_data_grid_body_row %}
+    <template
+        v-for="(item, itemIndex) in records"
+        :key="item.id">
+    <tr
+
+            class="sw-data-grid__row"
+            :class="getRowClasses(item, itemIndex)"
+    >
+
+        {% block sw_data_grid_body_cell_selection %}
+            <td
+                    v-if="showSelection"
+                    class="sw-data-grid__cell sw-data-grid__cell--selection"
+            >
+                <slot
+                        name="selection-content"
+                        v-bind="{ item, isSelected, isRecordSelectable, selectItem, itemIdentifierProperty }"
+                >
+                    {% block sw_data_grid_body_cell_selection_content %}
+                        <div class="sw-data-grid__cell-content">
+                            {% block sw_data_grid_select_item_checkbox %}
+                                <sw-checkbox-field
+                                        :aria-label="$tc('global.sw-data-grid.labelSelected')"
+                                        :disabled="!isRecordSelectable(item)"
+                                        :value="isSelected(item[itemIdentifierProperty])"
+                                        @update:value="selectItem($event, item)"
+                                />
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                </slot>
+            </td>
+        {% endblock %}
+
+        {% block sw_data_grid_body_columns %}
+            <td
+                    v-for="(column, columnIndex) in currentVisibleColumns"
+                    :key="`${item.id}-${columnIndex}`"
+                    class="sw-data-grid__cell"
+                    :class="getCellClasses(column)"
+                    role="gridcell"
+                    @dblclick="onDbClickCell(item)"
+            >
+                <sw-provide :aria-label="column.label">
+
+                    {% block sw_data_grid_body_columns_content %}
+                        <div class="sw-data-grid__cell-content">
+
+                            {% block sw_data_grid_preview_slot %}
+                                <slot
+                                        v-if="previews && !isInlineEdit(item)"
+                                        :name="`preview-${column.property}`"
+                                        v-bind="{ item, column, compact }"
+                                ></slot>
+                            {% endblock %}
+
+                            {% block sw_data_grid_columns_slot %}
+                                <slot
+                                        :name="`column-${column.property}`"
+                                        v-bind="{ item, itemIndex, column, columnIndex, compact, isInlineEdit: (isInlineEdit(item) && column.hasOwnProperty('inlineEdit')), selectItem }"
+                                >
+                                    <template v-if="column.inlineEdit === 'boolean'">
+                                        {% block sw_data_grid_columns_boolean %}
+                                            <sw-data-grid-column-boolean
+                                                    v-model:value="item[column.property]"
+                                                    :is-inline-edit="isInlineEdit(item) && column.hasOwnProperty('inlineEdit')"
+                                            />
+                                        {% endblock %}
+                                    </template>
+                                    <template v-else>
+                                        {% block sw_data_grid_columns_inline_edit %}
+                                            <template v-if="isInlineEdit(item) && column.hasOwnProperty('inlineEdit')">
+                                                {% block sw_data_grid_columns_render_inline_edit %}
+                                                    <sw-data-grid-inline-edit
+                                                            v-model:value="item[column.property]"
+                                                            :column="column"
+                                                            :compact="compact"
+                                                    />
+                                                {% endblock %}
+                                            </template>
+                                        {% endblock %}
+
+                                        {% block sw_data_grid_columns_value %}
+                                            <template v-else>
+                                                {% block sw_data_grid_columns_render_router_link %}
+                                                    <router-link
+                                                            v-if="column.routerLink"
+                                                            class="sw-data-grid__cell-value"
+                                                            :to="{ name: column.routerLink, params: { id: item.id } }"
+                                                    >
+                                                        <component
+                                                                v-if="column.component"
+                                                                :is="column.component"
+                                                                :item="item"
+                                                                :column="column"
+                                                                :value="renderColumn(item, column)"
+                                                        />
+                                                        <span v-else>
+                                                            {{ renderColumn(item, column) }}
+                                                        </span>
+                                                    </router-link>
+                                                {% endblock %}
+                                                {% block sw_data_grid_columns_render_value %}
+                                                    <span
+                                                            v-else
+                                                            class="sw-data-grid__cell-value"
+                                                    >
+                                                        <sw-button
+                                                                v-if="isGroupedColumn(column)"
+                                                                size="x-small"
+                                                                variant="context"
+                                                                @click="toggleItemExpand(item, column)"
+                                                        >
+                                                            <sw-icon :name="isItemColumnExpanded(item, column) ? 'regular-minus-square' : 'regular-plus-square'" small></sw-icon>
+                                                        </sw-button>
+
+                                                        <component
+                                                                v-if="column.component"
+                                                                :is="column.component"
+                                                                :item="item"
+                                                                :column="column"
+                                                                :value="renderColumn(item, column)"
+                                                        />
+                                                        <span v-else>
+                                                            {{ renderColumn(item, column) }}
+                                                        </span>
+                                                    </span>
+                                                {% endblock %}
+                                            </template>
+                                        {% endblock %}
+                                    </template>
+                                </slot>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                </sw-provide>
+            </td>
+        {% endblock %}
+
+        {% block sw_data_grid_body_cell_spacer %}
+            <td
+                    v-if="hasResizeColumns"
+                    aria-hidden="true"
+                    class="sw-data-grid__cell sw-data-grid__cell-spacer"
+                    @dblclick="onDbClickCell(item)"
+            >
+                <div class="sw-data-grid__cell-content"></div>
+            </td>
+        {% endblock %}
+
+        {% block sw_data_grid_body_cell_actions %}
+            <td
+                    v-if="showActions"
+                    class="sw-data-grid__cell sw-data-grid__cell--actions"
+            >
+                {% block sw_data_grid_body_cell_actions_content %}
+                    <div class="sw-data-grid__cell-content">
+
+                        {% block sw_data_grid_inline_edit_actions %}
+                            <template v-if="isInlineEditActive && currentInlineEditId === item[itemIdentifierProperty]">
+
+                                {% block sw_data_grid_inline_edit_actions_cancel %}
+                                    <sw-button
+                                            class="sw-data-grid__inline-edit-cancel"
+                                            size="x-small"
+                                            :title="$tc('global.default.cancel')"
+                                            :aria-label="$tc('global.default.cancel')"
+                                            square
+                                            @click="onClickCancelInlineEdit(item)"
+                                    >
+                                        {% block sw_data_grid_inline_edit_actions_cancel_icon %}
+                                            <sw-icon name="regular-times-xs" />
+                                        {% endblock %}
+                                    </sw-button>
+                                {% endblock %}
+
+                                {% block sw_data_grid_inline_edit_actions_save %}
+                                    <sw-button
+                                            class="sw-data-grid__inline-edit-save"
+                                            variant="primary"
+                                            size="x-small"
+                                            :title="$tc('global.default.save')"
+                                            :aria-label="$tc('global.default.save')"
+                                            square
+                                            @click="onClickSaveInlineEdit(item)"
+                                    >
+                                        {% block sw_data_grid_inline_edit_actions_save_icon %}
+                                            <sw-icon
+                                                    name="regular-checkmark-xxs"
+                                            />
+                                        {% endblock %}
+                                    </sw-button>
+                                {% endblock %}
+                            </template>
+                        {% endblock %}
+
+                        {% block sw_data_grid_body_cell_actions_menu %}
+                            <sw-context-button
+                                    v-else
+                                    :menu-width="contextButtonMenuWidth"
+                                    class="sw-data-grid__actions-menu"
+                                    aria-label="global.sw-data-grid.actionsMenu"
+                            >
+                                <slot
+                                        name="actions"
+                                        :item="item"
+                                        :item-index="itemIndex"
+                                >
+                                    {% block sw_data_grid_slot_actions %}{% endblock %}
+                                </slot>
+                            </sw-context-button>
+                        {% endblock %}
+
+                        {% block sw_data_grid_body_cell_action_modals %}
+                            <slot
+                                    name="action-modals"
+                                    :item="item"
+                            >
+                                {% block sw_data_grid_slot_action_modals %}{% endblock %}
+                            </slot>
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+            </td>
+        {% endblock %}
+    </tr>
+    <tr class="sw-data-grid__child-row" v-if="childItems[item.id] && isItemExpanded(item)">
+        <td :colspan="currentVisibleColumns.length + 3">
+            <sw-entity-listing
+                :columns="columns"
+                :items="childItems[item.id]"
+                :repository="repository"
+                :full-page="false"
+                />
+        </td>
+    </tr>
+    </template>
 {% endblock %}
