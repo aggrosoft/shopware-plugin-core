@@ -3,7 +3,7 @@
 
         {% block aggro_entity_detail_header %}
             <template #smart-bar-header>
-                <h2>{{ placeholder(editEntity, 'name', $tc('aggro.entity-detail.textHeadline')) }}</h2>
+                <h2>{{ title }}</h2>
             </template>
 
         {% endblock %}
@@ -104,7 +104,7 @@
 
                         {% block aggro_entity_detail_content_language_info %}
                             <sw-language-info
-                                    :entity-description="placeholder(entity, 'name', $tc('aggro.entity-detail.textHeadline'))"
+                                    :entity-description="title"
                             />
                         {% endblock %}
 
@@ -113,12 +113,12 @@
                                     v-if="!isCreateMode"
                                     class="aggro-entity-detail__tabs"
                                     position-identifier="aggro-entity-detail-tabs"
-                                    :default-item="forms[0].ident"
+                                    :default-item="formsToRender[0].ident"
                             >
 
                                 <template #default="{ active }">
                                     <sw-tabs-item
-                                            v-for="form in forms"
+                                            v-for="form in formsToRender"
                                             :key="`tab-item-${form.ident}`"
                                             class="aggro-entity-detail__tab-item"
                                             :name="form.ident"
@@ -130,7 +130,7 @@
 
                                 <template #content="{ active }">
                                     <template
-                                            v-for="form in forms"
+                                            v-for="form in formsToRender"
                                             :key="`tab-${form.ident}`"
                                     >
                                         <div

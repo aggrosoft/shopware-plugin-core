@@ -19,7 +19,6 @@ export default {
     ],
 
     mixins: [
-        Mixin.getByName('placeholder'),
         Mixin.getByName('notification'),
         Mixin.getByName('discard-detail-page-changes')('entity'),
     ],
@@ -41,7 +40,12 @@ export default {
         labels: Object,
         links: Object,
         forms: Object,
-        context: Object
+        context: Object,
+        titleProperty: {
+            type: String,
+            required: false,
+            default: 'name'
+        }
     },
 
     data() {
@@ -64,7 +68,7 @@ export default {
 
     metaInfo() {
         return {
-            title: this.$createTitle(this.identifier),
+            title: this.$createTitle(this.title),
         };
     },
 
@@ -76,8 +80,12 @@ export default {
         currentLanguage() {
             return State.get('context').api.languageId;
         },
-        identifier() {
-            return this.placeholder(this.editEntity, 'name');
+        title() {
+            if (!this.editEntity) {
+                return this.$tc('aggro.entity-detail.textHeadline');
+            }
+            const title = this.titleProperty.split('.').reduce((a, b) => a[b], this.editEntity)
+            return title || this.$tc('aggro.entity-detail.textHeadline');
         },
 
         entityIsLoading() {
@@ -112,7 +120,7 @@ export default {
                     }else if(card.fields){
                         for(const field of card.fields){
                             const prop = definition.properties[field.ref];
-                            console.log('Definition:', definition, 'Field:', field, 'Prop:', prop);
+
                             if (prop && prop.type === 'association' && prop.relation === 'many_to_many'){
                                 associations.push(field.ref);
                                 if (field.associations) {
@@ -177,6 +185,9 @@ export default {
         },
         assetFilter() {
             return Shopware.Filter.getByName('asset');
+        },
+        formsToRender() {
+            return this.forms.filter(form => this.formConditionMet(form));
         }
     },
 
@@ -259,6 +270,14 @@ export default {
 
         onDropMedia(dragData) {
             this.setMediaItem({ targetId: dragData.id });
+        },
+
+        formConditionMet(form) {
+            if (!form.condition) {
+                return true;
+            }
+
+            return form.condition.call(this, this.editEntity);
         },
 
         onSave() {
