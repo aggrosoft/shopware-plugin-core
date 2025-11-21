@@ -23,7 +23,7 @@ class MigrationQueryGenerator
 
     public function generateQueries(EntityDefinition $entityDefinition): array
     {
-        $tableExists = $this->connection->createSchemaManager()->tablesExist($entityDefinition->getEntityName());
+        $tableExists = $this->connection->createSchemaManager()->tablesExist([$entityDefinition->getEntityName()]);
 
         if ($tableExists) {
             return $this->getAlterTableQueries($entityDefinition);
