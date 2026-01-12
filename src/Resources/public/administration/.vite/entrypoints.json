@@ -1,0 +1,30 @@
+{
+  "base": "/bundles/aggroplugincoreplugin/administration/",
+  "entryPoints": {
+    "aggro-plugin-core-plugin": {
+      "css": [],
+      "dynamic": [
+        "/bundles/aggroplugincoreplugin/administration/assets/index-C-SdjvZZ.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-DfO26yvi.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-IgSic2N8.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-DE8ceo6e.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-marYGeZY.js",
+        "/bundles/aggroplugincoreplugin/administration/assets/index-C6horIJp.js"
+      ],
+      "js": [
+        "/bundles/aggroplugincoreplugin/administration/assets/aggro-plugin-core-plugin-BJY5Fy5v.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
