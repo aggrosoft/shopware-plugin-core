@@ -19,7 +19,12 @@ class EntityMigrator
     public function migrate(array $entities): void
     {
         foreach ($entities as $entity) {
-            $entityDefinition = $this->registry->getByEntityName($entity);
+            try {
+                $entityDefinition = $this->registry->getByEntityName($entity);
+            }catch( \Exception $exception){
+                continue;
+            }
+
             $queries = $this->queryGenerator->generateQueries($entityDefinition);
 
             $relatedDefinitions = $this->getRelatedDefinitions($entityDefinition);
