@@ -51,7 +51,7 @@ class MigrationQueryGenerator
 
 
 
-        return $this->getPlatform()->getAlterTableSQL((new Comparator())->compareTables($originalTableSchema, $tableSchema));
+        return $this->getPlatform()->getAlterTableSQL((new Comparator($this->getPlatform()))->compareTables($originalTableSchema, $tableSchema));
     }
 
     /**
