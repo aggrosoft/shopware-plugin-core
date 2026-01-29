@@ -1,0 +1,58 @@
+{
+  "component/form/aggro-entity-listing/index.js": {
+    "file": "assets/index-C6horIJp.js",
+    "name": "index",
+    "src": "component/form/aggro-entity-listing/index.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/index-BN78IafU.css"
+    ]
+  },
+  "component/form/aggro-form-field-renderer/index.js": {
+    "file": "assets/index-DDXiuWTC.js",
+    "name": "index",
+    "src": "component/form/aggro-form-field-renderer/index.js",
+    "isDynamicEntry": true
+  },
+  "component/form/aggro-product-multi-select/index.js": {
+    "file": "assets/index-marYGeZY.js",
+    "name": "index",
+    "src": "component/form/aggro-product-multi-select/index.js",
+    "isDynamicEntry": true
+  },
+  "component/form/aggro-product-single-select/index.js": {
+    "file": "assets/index-DE8ceo6e.js",
+    "name": "index",
+    "src": "component/form/aggro-product-single-select/index.js",
+    "isDynamicEntry": true
+  },
+  "component/structure/entity-detail/index.js": {
+    "file": "assets/index-DfO26yvi.js",
+    "name": "index",
+    "src": "component/structure/entity-detail/index.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/index-CQ_zqKMn.css"
+    ]
+  },
+  "component/structure/entity-list/index.js": {
+    "file": "assets/index-C-SdjvZZ.js",
+    "name": "index",
+    "src": "component/structure/entity-list/index.js",
+    "isDynamicEntry": true
+  },
+  "main.js": {
+    "file": "assets/aggro-plugin-core-plugin-lPSEDXZ_.js",
+    "name": "aggro-plugin-core-plugin",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "component/structure/entity-list/index.js",
+      "component/structure/entity-detail/index.js",
+      "component/form/aggro-form-field-renderer/index.js",
+      "component/form/aggro-product-single-select/index.js",
+      "component/form/aggro-product-multi-select/index.js",
+      "component/form/aggro-entity-listing/index.js"
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+const i='<sw-entity-multi-select v-bind="$attrs" v-bind:value="value" v-bind:entity-collection="entityCollection" v-on="$listeners" :criteria="criteriaWithVariation" > </sw-entity-multi-select>',e={template:i,computed:{criteriaWithVariation(){const t=this.criteria||new Shopware.Data.Criteria(1,this.resultLimit||25);return t.addAssociation("options.group"),t}}};export{e as default};
+//# sourceMappingURL=index-marYGeZY.js.map
